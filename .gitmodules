@@ -1,0 +1,3 @@
+[submodule "lib/vec"]
+	path = lib/vec
+	url = git@github.com:Hirevo/libvec-c
