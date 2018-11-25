@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(demo C)
+project(my_screensaver C)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
@@ -9,7 +9,7 @@ add_subdirectory(lib/vec)
 find_package(SFML REQUIRED graphics window system)
 link_directories(/usr/local/lib)
 
-add_executable(demo
+add_executable(my_screensaver
     ${PROJECT_SOURCE_DIR}/src/draw.c
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/window.c
@@ -19,5 +19,5 @@ add_executable(demo
     ${PROJECT_SOURCE_DIR}/src/fade/fade.c
     ${PROJECT_SOURCE_DIR}/src/morph/morph.c
 )
-target_link_libraries(demo ${SFML_LIBRARIES} m csfml-graphics csfml-window vec)
-target_include_directories(demo PRIVATE ${PROJECT_SOURCE_DIR}/include ${SFML_INCLUDE_DIR} /usr/local/include)
+target_link_libraries(my_screensaver ${SFML_LIBRARIES} m csfml-graphics csfml-window vec)
+target_include_directories(my_screensaver PRIVATE ${PROJECT_SOURCE_DIR}/include ${SFML_INCLUDE_DIR} /usr/local/include)
