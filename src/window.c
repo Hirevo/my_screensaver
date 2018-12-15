@@ -23,11 +23,13 @@ Window create_window(sfUint32 style, size_t width, size_t height)
         .win = 0,
     };
 
-    window.win = sfRenderWindow_create(window.mode, "Demo Igraph", style, 0);
+    window.win =
+        sfRenderWindow_create(window.mode, "my_screensaver", style, 0);
     if (window.win == 0)
         return window;
     sfRenderWindow_setFramerateLimit(window.win, 60);
-    // sfRenderWindow_setVerticalSyncEnabled(window.win, sfTrue);
+    sfRenderWindow_setVerticalSyncEnabled(window.win, sfTrue);
+    sfRenderWindow_setMouseCursorVisible(window.win, sfFalse);
     return window;
 }
 
@@ -51,7 +53,7 @@ Context create_context(size_t width, size_t height, Color fill_color)
 
 int disp_routines()
 {
-    for (size_t i = 0; i < 3; i++)
+    for (size_t i = 0; i < 5; i++)
         printf("%zu: %s\n", i, descriptions[i]);
     return 0;
 }
@@ -63,7 +65,7 @@ int main(int ac, char **av)
     if (strcmp(av[1], "-d") == 0)
         return disp_routines();
     int id = atoi(av[1]);
-    if (id > 2)
+    if (id > 4)
         return 84;
     return routines[id]();
 }

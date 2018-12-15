@@ -6,6 +6,22 @@
 */
 
 #include "screensaver.h"
+#include <math.h>
+
+size_t smax(size_t x, size_t y)
+{
+    return (x > y) ? x : y;
+}
+
+size_t smin(size_t x, size_t y)
+{
+    return (x < y) ? x : y;
+}
+
+size_t sclamp(size_t a, size_t x, size_t y)
+{
+    return smax(smin(a, y), x);
+}
 
 void put_pixel(Context *ctx, Vec pos, Color c)
 {
@@ -20,10 +36,24 @@ void put_pixel(Context *ctx, Vec pos, Color c)
     }
 }
 
+Color get_pixel(Context *ctx, Vec pos)
+{
+    const long safe_x = sclamp(pos.x, 0, ctx->width - 1);
+    const long safe_y = sclamp(pos.y, 0, ctx->height - 1);
+    const long index = (safe_y * ctx->width + safe_x) * 4;
+
+    return (Color){
+        .r = ctx->pixels[index + 0],
+        .g = ctx->pixels[index + 1],
+        .b = ctx->pixels[index + 2],
+        .a = ctx->pixels[index + 3],
+    };
+}
+
 void fade_context(Context *ctx, int decr)
 {
-    for (int y = 0; y < ctx->height; y++)
-        for (int x = 0; x < ctx->width; x++) {
+    for (size_t y = 0; y < ctx->height; y++)
+        for (size_t x = 0; x < ctx->width; x++) {
             int tmp = (x + y * ctx->width) * 4;
             ctx->pixels[tmp + 0] = (ctx->pixels[tmp + 0] > decr) ?
                 ctx->pixels[tmp + 0] - decr :

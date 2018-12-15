@@ -7,22 +7,22 @@
 
 #include "screensaver.h"
 #include "vec.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
-static Entity create_morph(Context *ctx)
+static Entity create_meta(Context *ctx)
 {
     return (Entity){
-        .pos = (Vec){rand() % ctx->width, rand() % ctx->height},
+        .pos = (Vec){irand() % ctx->width, irand() % ctx->height},
         .dir =
             (Vec){
-                ((float)(rand())) * MORPH_SPEED / ((float)(RAND_MAX)) - 1.5,
-                ((float)(rand())) * MORPH_SPEED / ((float)(RAND_MAX)) - 1.5,
+                frand() * META_SPEED / RANDF_MAX - 1.5,
+                frand() * META_SPEED / RANDF_MAX - 1.5,
             },
-        .color = (Color){rand() % 128, rand() % 128, rand() % 128, 255},
-        .size = 10,
+        .color = (Color){irand() % 128, irand() % 128, irand() % 128, 255},
+        .size = (Vec){10, 10},
     };
 }
 
@@ -65,9 +65,8 @@ static void morph_tick(Window *window, Context *ctx, vec_t *entities)
 {
     morph_move(ctx, entities);
     sfRenderWindow_clear(window->win, sfBlack);
-    for (int y = 0; y < ctx->height; y++)
-        for (int x = 0; x < ctx->width; x++) {
-            int idx = (x + y * ctx->width) * 4;
+    for (size_t y = 0; y < ctx->height; y++)
+        for (size_t x = 0; x < ctx->width; x++) {
             Color color = animate(entities, (Vec){x, y});
             put_pixel(ctx, (Vec){x, y}, color);
         }
@@ -103,19 +102,18 @@ static void destroy_routine(Window *window, Context *ctx, vec_t *entities)
     sfRenderWindow_destroy(window->win);
 }
 
-int main_morph(void)
+int main_meta(void)
 {
     Window window = create_window(sfClose, 600, 600);
     Context ctx = create_context(
         window.mode.width, window.mode.height, (Color){0, 0, 0, 255});
 
-    srand(time(0) * getpid());
     if (window.win == 0 || ctx.pixels == 0 || ctx.sprite == 0 ||
         ctx.texture == 0)
         return 84;
-    vec_t *entities = lvec_with_capacity(MORPH_DENSITY);
-    for (int i = 0; i < MORPH_DENSITY; i++) {
-        Entity entity = create_morph(&ctx);
+    vec_t *entities = lvec_with_capacity(META_DENSITY);
+    for (int i = 0; i < META_DENSITY; i++) {
+        Entity entity = create_meta(&ctx);
         Entity *allocated = malloc(sizeof(Entity));
         if (allocated == 0)
             return 84;

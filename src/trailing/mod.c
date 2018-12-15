@@ -15,7 +15,24 @@
 #include <time.h>
 #include <unistd.h>
 
-static void animate(Window *window, Context *ctx, vec_t *entities, bool filled)
+static Entity create_trailing_entity(Context *ctx)
+{
+    return (Entity){
+        .pos = (Vec){irand() % ctx->width, irand() % ctx->height},
+        .dir =
+            (Vec){
+                ceilf(frand() * TRAILING_DOUBLE_SPEED / RANDF_MAX -
+                    TRAILING_SPEED),
+                ceilf(frand() * TRAILING_DOUBLE_SPEED / RANDF_MAX -
+                    TRAILING_SPEED),
+            },
+        .size = (Vec){TRAILING_SIZE, TRAILING_SIZE},
+        .color = (Color){irand() % 256, irand() % 256,
+            irand() % 256, 255},
+    };
+}
+
+static void animate(Context *ctx, vec_t *entities, bool filled)
 {
     size_t size = lvec_size(entities);
 
@@ -23,20 +40,20 @@ static void animate(Window *window, Context *ctx, vec_t *entities, bool filled)
         Entity *elem = entities->arr[i];
         elem->pos.x += elem->dir.x;
         elem->pos.y += elem->dir.y;
-        if ((elem->pos.x + FADE_HALF_SIZE) >= ctx->width)
+        if ((elem->pos.x + TRAILING_HALF_SIZE) >= ctx->width)
             elem->dir.x = -fabsf(elem->dir.x);
-        else if ((elem->pos.x - FADE_HALF_SIZE) < 0)
+        else if ((elem->pos.x - TRAILING_HALF_SIZE) < 0)
             elem->dir.x = fabsf(elem->dir.x);
-        if ((elem->pos.y + FADE_HALF_SIZE) >= ctx->height)
+        if ((elem->pos.y + TRAILING_HALF_SIZE) >= ctx->height)
             elem->dir.y = -fabsf(elem->dir.y);
-        else if ((elem->pos.y - FADE_HALF_SIZE) < 0)
+        else if ((elem->pos.y - TRAILING_HALF_SIZE) < 0)
             elem->dir.y = fabsf(elem->dir.y);
         if (filled)
             draw_filled_circle(ctx, (Vec){elem->pos.x, elem->pos.y},
-                FADE_HALF_SIZE - 1, elem->color);
+                TRAILING_HALF_SIZE - 1, elem->color);
         else
             draw_circle(ctx, (Vec){elem->pos.x, elem->pos.y},
-                FADE_HALF_SIZE - 1, elem->color);
+                TRAILING_HALF_SIZE - 1, elem->color);
     }
 }
 
@@ -54,8 +71,8 @@ static void main_routine(Window *window, Context *ctx, vec_t *entities)
                 filled = !filled;
         }
         sfRenderWindow_clear(window->win, col(0, 0, 0, 255));
-        fade_context(ctx, FADE_TRAIL);
-        animate(window, ctx, entities, filled);
+        fade_context(ctx, TRAILING_TRAIL);
+        animate(ctx, entities, filled);
         sfTexture_updateFromPixels(
             ctx->texture, ctx->pixels, ctx->width, ctx->height, 0, 0);
         sfRenderWindow_drawSprite(window->win, ctx->sprite, 0);
@@ -76,7 +93,7 @@ static void destroy_routine(Window *window, Context *ctx, vec_t *entities)
     sfRenderWindow_destroy(window->win);
 }
 
-int main_fade(void)
+int main_trailing(void)
 {
     size_t count;
     const sfVideoMode *modes = sfVideoMode_getFullscreenModes(&count);
@@ -86,16 +103,16 @@ int main_fade(void)
             modes[i].height);
     Window window =
         create_window(sfFullscreen, modes[0].width, modes[0].height);
+    // create_window(sfClose, 1920, 1080);
     Context ctx = create_context(
         window.mode.width, window.mode.height, (Color){0, 0, 0, 255});
 
-    srand(time(0) * getpid());
     if (window.win == 0 || ctx.pixels == 0 || ctx.sprite == 0 ||
         ctx.texture == 0)
         return 84;
-    vec_t *entities = lvec_with_capacity(FADE_DENSITY);
-    for (int i = 0; i < FADE_DENSITY; i++) {
-        Entity entity = create_fade_entity(&ctx);
+    vec_t *entities = lvec_with_capacity(TRAILING_DENSITY);
+    for (int i = 0; i < TRAILING_DENSITY; i++) {
+        Entity entity = create_trailing_entity(&ctx);
         Entity *allocated = malloc(sizeof(Entity));
         if (allocated == 0)
             return 84;
